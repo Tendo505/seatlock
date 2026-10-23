@@ -136,6 +136,8 @@ Configuration (environment variables): `SPRING_DATASOURCE_URL` / `_USERNAME` / `
 
 A third CI job builds the Docker image, starts it with PostgreSQL through Compose, and smoke-tests the live API.
 
+**Throughput under worst-case contention:** 2,000 concurrent holds for the *same* event, so every request fights over one row lock. On a standard GitHub Actions runner this sustains about **1,500 holds/s on PostgreSQL 16** (about 4,400/s on in-memory H2), and the books always balance.
+
 ## Design notes
 
 - **Spring JDBC (`JdbcClient`), not JPA.** The service's correctness rests on a few exact SQL statements, and an ORM's dirty checking would hide them. Each one is visible in [`Repositories.kt`](src/main/kotlin/io/github/tendo505/seatlock/repo/Repositories.kt).
