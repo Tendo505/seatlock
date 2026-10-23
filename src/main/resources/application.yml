@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: seatlock
+  datasource:
+    # In-memory H2 in PostgreSQL mode by default, so the app runs with zero setup.
+    # Point SPRING_DATASOURCE_URL at PostgreSQL for real deployments (see docker-compose.yml).
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:seatlock;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 20
+  mvc:
+    problemdetails:
+      enabled: true
+  jackson:
+    default-property-inclusion: non_null
+
+seatlock:
+  hold-ttl: ${SEATLOCK_HOLD_TTL:10m}
+  max-seats-per-hold: 10
+  # Required for creating events. Override in any real deployment.
+  admin-key: ${SEATLOCK_ADMIN_KEY:dev-admin-key}
+  expiry-sweep-interval: 15s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /docs

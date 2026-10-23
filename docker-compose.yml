@@ -1,0 +1,30 @@
+# docker compose up --build   ->   API on http://localhost:8080, docs at /docs
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: seatlock
+      POSTGRES_USER: seatlock
+      POSTGRES_PASSWORD: seatlock
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seatlock"]
+      interval: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/seatlock
+      SPRING_DATASOURCE_USERNAME: seatlock
+      SPRING_DATASOURCE_PASSWORD: seatlock
+      SEATLOCK_ADMIN_KEY: change-me
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
