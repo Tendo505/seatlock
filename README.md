@@ -10,6 +10,8 @@ A ticket-booking REST API in **Kotlin + Spring Boot + PostgreSQL** that **never 
 
 The point of the project is the correctness under concurrency, and the tests prove it.
 
+📱 **Android client:** [SeatLock for Android](https://github.com/Tendo505/seatlock-android) (Kotlin + Jetpack Compose) books against this API. [Download the APK](https://github.com/Tendo505/seatlock-android/releases/latest).
+
 ## The problem
 
 The obvious way to sell a seat is a race condition:
