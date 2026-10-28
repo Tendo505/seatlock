@@ -1,0 +1,41 @@
+name: Release
+
+# Pushing a tag like v1.0.0 builds the download, checks that it starts and answers, and publishes it.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, check and publish the download
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build the download
+        run: ./gradlew bootJar --console=plain
+      - name: Check the download runs
+        shell: bash
+        run: |
+          java -jar build/libs/seatlock-1.0.0.jar --server.port=8099 > /tmp/app.log 2>&1 &
+          for i in $(seq 60); do curl -sf localhost:8099/actuator/health && exit 0; sleep 1; done
+          cat /tmp/app.log; exit 1
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<'NOTES'
+          The ticket booking API as one runnable file. Needs Java 21 or newer.
+
+          1. Download **seatlock-1.0.0.jar** below.
+          2. Run `java -jar seatlock-1.0.0.jar`.
+          3. Open http://localhost:8080/docs to try it from the browser. The admin key for creating events is `dev-admin-key` unless you set `SEATLOCK_ADMIN_KEY`.
+
+          It uses an in-memory database by default. To keep the data in PostgreSQL, set `SPRING_DATASOURCE_URL` (see the README). The [Android app](https://github.com/Tendo505/seatlock-android/releases/latest) talks to it from the emulator at http://10.0.2.2:8080.
+          NOTES
+          gh release create "$GITHUB_REF_NAME" build/libs/seatlock-1.0.0.jar --repo "$GITHUB_REPOSITORY" --title "SeatLock $GITHUB_REF_NAME" --notes-file release-notes.md
