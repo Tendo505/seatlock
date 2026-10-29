@@ -8,6 +8,10 @@
 
 A ticket-booking REST API in **Kotlin + Spring Boot + PostgreSQL** that **never oversells**, no matter how many buyers hit it at once. Customers place a time-limited **hold** on seats, then **confirm** it. Holds that aren't confirmed expire and their seats go back on sale. Retries are safe thanks to **idempotency keys**.
 
+<p align="center">
+  <img src="docs/overview.png" width="760" alt="seatlock overview: example usage and architecture">
+</p>
+
 The point of the project is the correctness under concurrency, and the tests prove it.
 
 📱 **Android client:** [SeatLock for Android](https://github.com/Tendo505/seatlock-android) (Kotlin + Jetpack Compose) books against this API. [Download the APK](https://github.com/Tendo505/seatlock-android/releases/latest).
